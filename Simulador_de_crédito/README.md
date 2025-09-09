@@ -1,0 +1,7 @@
+# Credit Simulation API
+
+Some time ago, I joined in a hackathon which it objective was to create a credit simulation API in Java 17+ with Quarkus. Now I decided to rewrite this API with ASP.NET.<br>
+Basically, the API allows someone to simulate a loan, consulting all the products in one database, based in a request JSON, and then returns another JSON with the best product option, in addition to persisting the data locally. The API does two types of calculations, one for the amortization system SAC and the other for PRICE.<br>
+The API has an endpoint for simulate the calculation, an endpoint to list all the simulations, an endpoint to list the values simulated for each product for each day, and an endpoint to return the telemetry with the amount and response for each service.<br>
+The original Hackathon requested their participants to connect in a SQL Server, accessing their products and then save the data of the API's simulation in another database. Since the hackathon's SQL Server isn't available anymore, I used an Oracle database and saved the API's simulation data in a SQLite database.<br>
+The hackathon still asked to include all the files for execution via Dockerfile/Docker Compose.
