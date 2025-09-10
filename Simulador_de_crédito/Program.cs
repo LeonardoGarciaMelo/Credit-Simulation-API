@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Simulador_de_crédito.Data;
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load();
 
 // Add services to the container.
 
@@ -24,8 +27,15 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Configurar Oracle DbContext para a tabela Produto
+/*builder.Services.AddDbContext<OracleDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));*/
+// Configurar Oracle DbContext usando variáveis de ambiente
+var oracleConnectionString = $"User Id={Environment.GetEnvironmentVariable("ORACLE_USER")};" +
+                            $"Password={Environment.GetEnvironmentVariable("ORACLE_PASSWORD")};" +
+                            $"Data Source={Environment.GetEnvironmentVariable("ORACLE_HOST")}:" +
+                            $"{Environment.GetEnvironmentVariable("ORACLE_PORT")}/{Environment.GetEnvironmentVariable("ORACLE_SID")}";
 builder.Services.AddDbContext<OracleDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
+    options.UseOracle(oracleConnectionString));
 
 // Configurar SQLite DbContext para a tabela Simulations
 builder.Services.AddDbContext<SqliteDbContext>(options =>
