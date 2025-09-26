@@ -6,6 +6,6 @@ namespace Simulador_de_crédito.DTO
     {
        [Required(ErrorMessage = "O valor desejado não pode ser nulo.")]
        public decimal ValorDesejado { get; init; }
-       public short prazo { get; init; }
+       public short Prazo { get; init; }
     }
 }
