@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Simulador_de_crédito.Data;
 
-namespace Simulador_de_crédito.Controllers
+namespace Simulador_de_crédito.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
