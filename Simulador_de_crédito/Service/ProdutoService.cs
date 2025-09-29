@@ -35,6 +35,7 @@ namespace Simulador_de_crédito.Service
                 // 2. Projeta o resultado diretamente em um ProdutoDTO (cláusula SELECT em SQL)
                 .Select(p => new ProdutoDTO
                 {
+                    CoProduto = p.Id,
                     NoProduto = p.Nome,
                     PcTaxaJuros = p.PcTaxaJuros,
                     NuMinimoMeses = (short)p.NuMinimoMeses, // Cast explícito se os tipos forem diferentes
