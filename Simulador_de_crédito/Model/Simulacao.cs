@@ -1,5 +1,4 @@
-﻿using Simulador_de_crédito.DTO;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Simulador_de_crédito.Model
@@ -13,7 +12,7 @@ namespace Simulador_de_crédito.Model
 
         [Column("DATE")]
         [Required]
-        public DateTimeOffset Data {  get; set; } = DateTimeOffset.Now;
+        public DateTime Data {  get; set; } = DateTime.UtcNow;
 
         [Column("valor_desejado")]
         public decimal ValorDesejado { get; set; }
