@@ -7,6 +7,7 @@ using Simulador_de_crédito.Service;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<CalculoService>();
 builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<SimulacaoService>();
 
 DotEnv.Load();
 
@@ -43,9 +44,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Simulador_de_crédito v1");
+        /*options.SwaggerEndpoint("/swagger/v1/swagger.json", "Simulador_de_crédito v1");
        
-        options.RoutePrefix = string.Empty; 
+        options.RoutePrefix = string.Empty; */
+        app.UseSwagger();
+        app.UseSwaggerUI();
     });
 }
 

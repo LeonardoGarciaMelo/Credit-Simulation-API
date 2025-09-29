@@ -7,5 +7,7 @@
         public decimal ValorDesejado { get; init; }
         public short Prazo { get; init; }
         public decimal ValorTotalParcelas { get; init; }
+
+        public int CoProduto { get; init; }
     }
 }

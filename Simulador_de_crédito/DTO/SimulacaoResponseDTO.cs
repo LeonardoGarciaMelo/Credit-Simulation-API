@@ -14,5 +14,14 @@ namespace Simulador_de_crédito.DTO
         public decimal TaxaJuros { get; init; }
         [JsonPropertyName("Resultados")]
         public List<ResultadoSimulacaoDTO> ResultadoSimulacao { get; init; }
+
+        public SimulacaoResponseDTO(Guid simulacaoId, int codigoProduto, string codigoDescricao, decimal taxaJuros, List<ResultadoSimulacaoDTO> resultadoSimulacao)
+        {
+            SimulacaoId = simulacaoId;
+            CodigoProduto = codigoProduto;
+            CodigoDescricao = codigoDescricao;
+            TaxaJuros = taxaJuros;
+            ResultadoSimulacao = resultadoSimulacao;
+        }
     }
 }

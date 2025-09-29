@@ -5,12 +5,6 @@ namespace Simulador_de_crédito.Service
 {
     public class CalculoService
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-
-        public CalculoService(IServiceScopeFactory scopeFactory)
-        {
-            _scopeFactory = scopeFactory;
-        }
 
         public List<ParcelaDTO> CalculaSac(decimal SaldoDevedor, short Meses, decimal TaxaFinanciamento)
         {

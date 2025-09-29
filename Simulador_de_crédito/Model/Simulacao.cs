@@ -27,13 +27,14 @@ namespace Simulador_de_crédito.Model
         [Column("co_produto")]
         public int CoProduto { get; set; }
 
-       public Simulacao(SimulacaoDTO dto)
+      /* public Simulacao(SimulacaoDTO dto)
         {
             this.Id = dto.Id;
             this.Data = dto.Data;
             this.ValorDesejado = dto.ValorDesejado;
             this.Prazo = dto.Prazo;
             this.ValorTotalParcelas = dto.ValorTotalParcelas;
-        }
+            this.CoProduto = dto.CoProduto;
+        }*/
     }
 }
