@@ -1,8 +1,8 @@
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Simulador_de_crédito.Data;
-using Simulador_de_crédito.Service;
+using Simulador_de_Credito.Data;
+using Simulador_de_Credito.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<CalculoService>();

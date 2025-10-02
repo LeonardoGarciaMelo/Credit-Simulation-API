@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Simulador_de_crédito.Data;
-using Simulador_de_crédito.DTO;
+using Simulador_de_Credito.Data;
+using Simulador_de_Credito.DTO;
 
-namespace Simulador_de_crédito.Service
+namespace Simulador_de_Credito.Service
 {
     public class ProdutoService
     {

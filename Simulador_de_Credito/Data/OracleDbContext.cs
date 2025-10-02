@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Simulador_de_crédito.Model;
+using Simulador_de_Credito.Model;
 
-namespace Simulador_de_crédito.Data
+namespace Simulador_de_Credito.Data
 {
     public class OracleDbContext : DbContext
     {

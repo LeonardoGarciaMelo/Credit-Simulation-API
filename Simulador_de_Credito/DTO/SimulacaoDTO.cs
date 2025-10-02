@@ -1,4 +1,4 @@
-﻿namespace Simulador_de_crédito.DTO
+﻿namespace Simulador_de_Credito.DTO
 {
     public record SimulacaoDTO
     {

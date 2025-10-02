@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Simulador_de_crédito.Model
+namespace Simulador_de_Credito.Model
 {
     [Table("Simulacoes")]
     public class Simulacao

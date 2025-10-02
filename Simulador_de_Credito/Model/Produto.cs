@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Simulador_de_crédito.Model
+namespace Simulador_de_Credito.Model
 {
     public class Produto
     {

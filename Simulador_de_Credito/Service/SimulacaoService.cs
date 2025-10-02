@@ -1,9 +1,9 @@
-﻿using Simulador_de_crédito.Data;
-using Simulador_de_crédito.DTO;
-using Simulador_de_crédito.Model;
+﻿using Simulador_de_Credito.Data;
+using Simulador_de_Credito.DTO;
+using Simulador_de_Credito.Model;
 using System.Threading.Tasks;
 
-namespace Simulador_de_crédito.Service
+namespace Simulador_de_Credito.Service
 {
     public class SimulacaoService
     {

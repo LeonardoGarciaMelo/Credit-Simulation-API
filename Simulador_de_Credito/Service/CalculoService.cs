@@ -1,7 +1,7 @@
-﻿using Simulador_de_crédito.DTO;
+﻿using Simulador_de_Credito.DTO;
 using System.Diagnostics.Metrics;
 
-namespace Simulador_de_crédito.Service
+namespace Simulador_de_Credito.Service
 {
     public class CalculoService
     {
