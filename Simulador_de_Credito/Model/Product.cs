@@ -2,7 +2,14 @@
 
 namespace Simulador_de_Credito.Model
 {
-    public class Produto
+    /// <summary>
+    /// Representa a entidade de um produto de crédito, mapeada a partir do banco de dados.
+    /// </summary>
+    /// <remarks>
+    /// Esta classe define a estrutura de um produto de crédito, incluindo suas regras de negócio
+    /// como limites de valor, prazo e a taxa de juros associada.
+    /// </remarks>
+    public class Product
     {
         [Key]
         public int Id { get; set; }

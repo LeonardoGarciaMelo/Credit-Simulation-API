@@ -3,6 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Simulador_de_Credito.Model
 {
+    /// <summary>
+    /// Representa a entidade de uma simulação de crédito que foi salva no banco de dados.
+    /// </summary>
+    /// <remarks>
+    /// Esta classe define a estrutura dos dados que são persistidos no banco de dados local SQLite
+    /// a cada simulação bem-sucedida.
+    /// </remarks>
     [Table("Simulacoes")]
     public class Simulacao
     {
@@ -25,15 +32,5 @@ namespace Simulador_de_Credito.Model
 
         [Column("co_produto")]
         public int CoProduto { get; set; }
-
-      /* public Simulacao(SimulacaoDTO dto)
-        {
-            this.Id = dto.Id;
-            this.Data = dto.Data;
-            this.ValorDesejado = dto.ValorDesejado;
-            this.Prazo = dto.Prazo;
-            this.ValorTotalParcelas = dto.ValorTotalParcelas;
-            this.CoProduto = dto.CoProduto;
-        }*/
     }
 }

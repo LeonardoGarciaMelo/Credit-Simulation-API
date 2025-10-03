@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Simulador_de_Credito.Data;
 using Simulador_de_Credito.Service;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<CalculoService>();
@@ -24,6 +25,9 @@ builder.Services.AddSwaggerGen(options =>
         Title = "API Simulador de Crédito",
         Description = "API para o desafio técnico de simulação de crédito, desenvolvida em .NET 9."
     });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var oracleConnectionString = $"User Id={Environment.GetEnvironmentVariable("ORACLE_USER")};" +
@@ -54,9 +58,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        /*options.SwaggerEndpoint("/swagger/v1/swagger.json", "Simulador_de_crédito v1");
-       
-        options.RoutePrefix = string.Empty; */
         app.UseSwagger();
         app.UseSwaggerUI();
     });
