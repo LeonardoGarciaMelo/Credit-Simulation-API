@@ -41,10 +41,10 @@ builder.Services.AddDbContext<SqliteDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
 
 builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAngularApp",
+    options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.WithOrigins("http://localhost:4200")
+            builder.WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -69,7 +69,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowReactApp");
 
 app.UseAuthorization();
 
