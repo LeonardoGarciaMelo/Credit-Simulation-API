@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Simulador_de_Credito.DTO
-    ///<summary>
+    /// <summary>
     /// Representa o registro de uma simulação 
     /// </summary>
     /// <remarks>
@@ -11,7 +11,7 @@ namespace Simulador_de_Credito.DTO
     public record RegistrosDTO
     {
         [JsonPropertyName("idSimulacao")]
-        public int Id { get; init; }
+        public Guid Id { get; init; }
 
         [JsonPropertyName("valorDesejado")]
         public decimal ValorDesejado { get; init; }

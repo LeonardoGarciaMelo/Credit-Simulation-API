@@ -44,5 +44,25 @@ namespace Simulador_de_Credito.Controller
                 return NotFound(new {Erro = ex.Message});
             }
         }
+
+        /// <summary>
+        /// Lista todas as simulações de crédito já realizadas, de forma paginada.
+        /// </summary>
+        /// <remarks>
+        /// Retorna um objeto com os detalhes da paginação e a lista de simulações salvas no banco de dados.
+        /// Este endpoint delega a lógica de validação dos parâmetros e a consulta
+        /// diretamente para o Serviço de Simulação.
+        /// </remarks>
+        /// <param name="pagina">O número da página desejada. Se não for fornecido ou for inválido, o padrão será 1.</param>
+        /// <param name="limite">O número de registros por página. Se não for fornecido ou for inválido, o padrão será 20.</param>
+        /// <response code="200">Retorna o objeto ResultadoListAllSimulacoesDTO com a lista paginada de simulações.</response>
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ResultadoListAllSimulacoesDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ListarSimulacoes([FromQuery] int pagina = 1, [FromQuery] int limite = 20)
+        {
+            var resultado = await _simulacaoService.GetAllSimulacoes(pagina, limite);
+            return Ok(resultado);
+        }
     }
 }

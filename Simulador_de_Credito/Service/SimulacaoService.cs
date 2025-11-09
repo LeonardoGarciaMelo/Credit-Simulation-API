@@ -1,4 +1,5 @@
-﻿using Simulador_de_Credito.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Simulador_de_Credito.Data;
 using Simulador_de_Credito.DTO;
 using Simulador_de_Credito.Model;
 using System.Threading.Tasks;
@@ -30,6 +31,9 @@ namespace Simulador_de_Credito.Service
             _produtoService = produtoService;
             _sqliteDbContext = sqliteDbContext;
         }
+
+        private const int DEFAULT_LIMITE_PAGINA = 20;
+        private const int MAX_LIMITE_PAGINA = 100;
 
         /// <summary>
         /// Executa o fluxo completo de uma simulação de crédito.
@@ -78,6 +82,62 @@ namespace Simulador_de_Credito.Service
                 );
 
             return response;
+        }
+
+        /// <summary>
+        /// Busca uma lista paginada de todas as simulações realizadas, aplicando as regras de negócio de paginação.
+        /// </summary>
+        /// <remarks>
+        /// Este método é o responsável por "sanitizar" (validar) os parâmetros de paginação recebidos.
+        /// 1. Garante que a 'pagina' seja sempre ao menos 1.
+        /// 2. Garante que o 'limite' esteja dentro de um intervalo válido (entre 1 e MAX_LIMITE_PAGINA).
+        /// 3. Executa uma consulta otimizada ao banco de dados usando AsNoTracking(), Skip() e Take().
+        /// </remarks>
+        /// <param name="pagina">O número da página solicitado (não validado).</param>
+        /// <param name="limite">O número de registros por página solicitado (não validado).</param>
+        /// <returns>
+        /// Um <see cref="Task"/> que resolve para o <see cref="ResultadoListAllSimulacoesDTO"/> 
+        /// contendo os dados da paginação e a lista de registros da página solicitada.
+        /// </returns>
+        public async Task<ResultadoListAllSimulacoesDTO> GetAllSimulacoes(int pagina, int limite)
+        {
+            if (pagina < 1)
+            {
+                pagina = 1;
+            }
+
+            if (limite < 1)
+            {
+                limite = DEFAULT_LIMITE_PAGINA;
+            }
+
+            if (limite > MAX_LIMITE_PAGINA)
+            {
+                limite = MAX_LIMITE_PAGINA;
+            }
+
+            var totalRegistros = await _sqliteDbContext.Simulacoes.CountAsync();
+
+            var registros = await _sqliteDbContext.Simulacoes
+                .AsNoTracking()
+                .OrderByDescending(s => s.Data)
+                .Skip((pagina - 1) * limite)
+                .Take(limite)
+                .Select(S => new RegistrosDTO
+                {
+                    Id = S.Id,
+                    ValorDesejado = S.ValorDesejado,
+                    Prazo = S.Prazo,
+                    ValorTotalParcelas = S.ValorTotalParcelas,
+                })
+                .ToListAsync();
+
+            return new ResultadoListAllSimulacoesDTO(
+                Pagina: pagina,
+                QtdRegistros: totalRegistros,
+                QtdRegistrosPagina: registros.Count,
+                Registros: registros
+             );
         }
     }
 }
