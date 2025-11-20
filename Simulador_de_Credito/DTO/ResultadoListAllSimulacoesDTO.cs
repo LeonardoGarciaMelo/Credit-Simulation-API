@@ -2,6 +2,13 @@
 
 namespace Simulador_de_Credito.DTO
 {
+    /// <summary>
+    /// Representa o envelope de resposta para a listagem paginada de simulações de crédito.
+    /// </summary>
+    /// <remarks>
+    /// Este DTO encapsula os dados das simulações junto com os metadados de paginação,
+    /// permitindo que o front-end exiba a lista e controle a navegação entre páginas.
+    /// </remarks>
     public record ResultadoListAllSimulacoesDTO
     {
         [JsonPropertyName("pagina")]
