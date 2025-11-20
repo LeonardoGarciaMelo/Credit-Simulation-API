@@ -57,7 +57,7 @@ namespace Simulador_de_Credito.Controller
         /// <param name="limite">O número de registros por página. Se não for fornecido ou for inválido, o padrão será 20.</param>
         /// <response code="200">Retorna o objeto ResultadoListAllSimulacoesDTO com a lista paginada de simulações.</response>
 
-        [HttpGet]
+        [HttpGet("listar")]
         [ProducesResponseType(typeof(ResultadoListAllSimulacoesDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ListarSimulacoes([FromQuery] int pagina = 1, [FromQuery] int limite = 20)
         {
