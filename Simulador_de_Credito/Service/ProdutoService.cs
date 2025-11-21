@@ -54,5 +54,19 @@ namespace Simulador_de_Credito.Service
 
             return produtoEncontrado;
         }
+
+        public async Task<List<ProdutoDTO>> GetProdutosPorIdsAsync(List<int> ids)
+        {
+            return await _context.Produto
+                .AsNoTracking()
+                .Where(p => ids.Contains(p.Id))
+                .Select(p => new ProdutoDTO
+                {
+                    CoProduto = p.Id,
+                    NoProduto = p.Nome,
+                    PcTaxaJuros = p.PcTaxaJuros
+                })
+                .ToListAsync();
+        }
     }
 }

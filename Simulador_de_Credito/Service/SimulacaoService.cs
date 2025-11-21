@@ -139,5 +139,61 @@ namespace Simulador_de_Credito.Service
                 Registros: registros
              );
         }
+
+
+        public async Task<RelatorioDiario> GetVolumePorDiaAsync(DateTime dataReferencia)
+        {
+            var dataInicio = dataReferencia.Date;
+            var dataFim = dataReferencia.Date.AddDays(1).AddTicks(-1);
+
+            var resultadosParciais = await _sqliteDbContext.Simulacoes
+                .AsNoTracking()
+                .Where(s => s.CoProduto > 0)
+                .Where(s => s.Data >= dataInicio && s.Data <= dataFim)
+                .GroupBy(s => s.CoProduto)
+                .Select(g => new
+                {
+                    CodigoProduto = g.Key,
+                    MediaPrestacao = g.Average(s => s.ValorTotalParcelas / (decimal)s.Prazo),
+                    TotalDesejado = g.Sum(s => s.ValorDesejado),
+                    TotalCredito = g.Sum(s => s.ValorTotalParcelas)
+                })
+                .ToListAsync();
+
+            if (!resultadosParciais.Any())
+            {
+                return new RelatorioDiario(
+                    dataReferencia.ToString("yyyy-MM-dd"),
+                    new List<SimulacaoPorDiaDTO>()
+                );
+            }
+
+            var idsProdutos = resultadosParciais.Select(x => x.CodigoProduto).ToList();
+
+            var produtosInfo = await _produtoService.GetProdutosPorIdsAsync(idsProdutos);
+
+            var mapaProdutos = produtosInfo.ToDictionary(p => p.CoProduto, p => p);
+
+            var listaFinal = new List<SimulacaoPorDiaDTO>();
+
+            foreach (var parcial in resultadosParciais)
+            {
+                mapaProdutos.TryGetValue(parcial.CodigoProduto, out var produto);
+
+                var dto = new SimulacaoPorDiaDTO
+                {
+                    CodigoProduto = parcial.CodigoProduto,
+                    DescricaoProduto = produto?.NoProduto ?? $"Produto {parcial.CodigoProduto} (Não encontrado)",
+                    TaxaMediaJuro = produto?.PcTaxaJuros ?? 0,
+                    ValorMedioPrestacao = Math.Round(parcial.MediaPrestacao, 2),
+                    ValorTotalDesejado = parcial.TotalDesejado,
+                    ValorTotalCredito = parcial.TotalCredito
+                };
+
+                listaFinal.Add(dto);
+            }
+
+            return new RelatorioDiario(dataReferencia.ToString("yyyy-MM-dd"), listaFinal);
+        }
     }
 }
