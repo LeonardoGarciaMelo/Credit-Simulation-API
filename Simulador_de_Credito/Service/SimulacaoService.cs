@@ -140,8 +140,23 @@ namespace Simulador_de_Credito.Service
              );
         }
 
-
-        public async Task<RelatorioDiario> GetVolumePorDiaAsync(DateTime dataReferencia)
+        /// <summary>
+        /// Gera um relatório consolidado de volume de simulações por produto para uma data específica.
+        /// </summary>
+        /// <remarks>
+        /// O processo é realizado em três etapas para otimizar a performance em um ambiente de bancos distribuídos:
+        /// <list type="number">
+        /// <item><b>Agregação Local (SQLite):</b> Filtra as simulações do dia e agrupa os dados financeiros (somas e médias) por código de produto.</item>
+        /// <item><b>Busca Remota (Oracle):</b> Com os códigos identificados, busca em lote as descrições e taxas na tabela de produtos.</item>
+        /// <item><b>Enriquecimento em Memória:</b> Cruza os dados agregados com as informações cadastrais para gerar o DTO final.</item>
+        /// </list>
+        /// </remarks>
+        /// <param name="dataReferencia">A data base para a geração do relatório.</param>
+        /// <returns>
+        /// Um objeto <see cref="RelatorioDiario"/> contendo a data formatada e a lista de métricas por produto.
+        /// Se não houver simulações no dia, retorna uma lista vazia.
+        /// </returns>
+        public async Task<RelatorioDiario> GetVolumePorDia(DateTime dataReferencia)
         {
             var dataInicio = dataReferencia.Date;
             var dataFim = dataReferencia.Date.AddDays(1).AddTicks(-1);
@@ -170,7 +185,7 @@ namespace Simulador_de_Credito.Service
 
             var idsProdutos = resultadosParciais.Select(x => x.CodigoProduto).ToList();
 
-            var produtosInfo = await _produtoService.GetProdutosPorIdsAsync(idsProdutos);
+            var produtosInfo = await _produtoService.GetProdutosPorIds(idsProdutos);
 
             var mapaProdutos = produtosInfo.ToDictionary(p => p.CoProduto, p => p);
 

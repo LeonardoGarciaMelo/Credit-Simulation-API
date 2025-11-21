@@ -103,7 +103,7 @@ namespace Simulador_de_Credito.Controller
                     return BadRequest(new { Mensagem = "Data inválida. Use o formato YYYY-MM-DD." });
                 }
 
-                var relatorio = await _simulacaoService.GetVolumePorDiaAsync(dataReferencia);
+                var relatorio = await _simulacaoService.GetVolumePorDia(dataReferencia);
 
                 return Ok(relatorio);
             }

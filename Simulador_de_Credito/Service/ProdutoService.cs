@@ -55,7 +55,16 @@ namespace Simulador_de_Credito.Service
             return produtoEncontrado;
         }
 
-        public async Task<List<ProdutoDTO>> GetProdutosPorIdsAsync(List<int> ids)
+        /// <summary>
+        /// Busca as informações detalhadas de um conjunto específico de produtos no banco de dados Oracle.
+        /// </summary>
+        /// <remarks>
+        /// Utiliza a cláusula 'IN' do SQL (via <c>ids.Contains</c>) para recuperar múltiplos produtos 
+        /// em uma única ida ao banco de dados (Round-trip), otimizando o processo de enriquecimento de relatórios.
+        /// </remarks>
+        /// <param name="ids">Uma lista contendo os IDs (códigos) dos produtos a serem recuperados.</param>
+        /// <returns>Uma lista de <see cref="ProdutoDTO"/> contendo apenas os campos necessários (Id, Nome, Taxa).</returns>
+        public async Task<List<ProdutoDTO>> GetProdutosPorIds(List<int> ids)
         {
             return await _context.Produto
                 .AsNoTracking()

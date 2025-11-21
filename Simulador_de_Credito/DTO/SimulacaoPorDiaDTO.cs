@@ -2,6 +2,9 @@
 
 namespace Simulador_de_Credito.DTO
 {
+    /// <summary>
+    /// Representa as métricas consolidadas de um produto específico no relatório diário.
+    /// </summary>
     public record SimulacaoPorDiaDTO
     {
         [JsonPropertyName("codigoProduto")]
