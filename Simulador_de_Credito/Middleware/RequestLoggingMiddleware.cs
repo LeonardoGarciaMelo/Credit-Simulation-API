@@ -7,6 +7,7 @@ namespace Simulador_de_Credito.Middleware
     {
         private readonly RequestDelegate _next;
 
+        private static readonly Serilog.ILogger TelemetriaLogger = Log.ForContext("TipoLog", "Telemetria");
         public RequestLoggingMiddleware(RequestDelegate next)
         {
             _next = next;
@@ -28,7 +29,7 @@ namespace Simulador_de_Credito.Middleware
             {
                 stopwatch.Stop();
                 // O Serilog grava automaticamente o StackTrace completo no arquivo
-                Log.Error(ex, "FALHA CRÍTICA | {Metodo} {Path} | Tempo: {TempoGasto}ms",
+                TelemetriaLogger.Error(ex, "FALHA | {Metodo} {Path} | Tempo: {TempoGasto}ms",
                     metodo, path, stopwatch.ElapsedMilliseconds);
 
                 throw;
@@ -45,12 +46,12 @@ namespace Simulador_de_Credito.Middleware
                 {
                     if (!sucesso)
                     {
-                        Log.Warning("ALERTA | {Metodo} {Path} | Status: {StatusCode} | Tempo: {TempoGasto}ms",
+                        TelemetriaLogger.Warning("ALERTA | {Metodo} {Path} | Status: {StatusCode} | Tempo: {TempoGasto}ms",
                             metodo, path, statusCode, tempoGasto);
                     }
                     else
                     {
-                        Log.Information("SUCESSO | {Metodo} {Path} | Status: {StatusCode} | Tempo: {TempoGasto}ms",
+                        TelemetriaLogger.Information("SUCESSO | {Metodo} {Path} | Status: {StatusCode} | Tempo: {TempoGasto}ms",
                             metodo, path, statusCode, tempoGasto);
                     }
                 }

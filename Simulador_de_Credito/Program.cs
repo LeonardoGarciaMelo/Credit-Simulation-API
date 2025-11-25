@@ -8,108 +8,149 @@ using Simulador_de_Credito.Middleware;
 using Simulador_de_Credito.Service;
 using System.Reflection;
 
-var builder = WebApplication.CreateBuilder(args);
-
+// Configuração inicial leve apenas para garantir que erros de startup sejam gravados.
+// Se a aplicação quebrar este logger vai salvar o erro no arquivo.
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    // Ignora logs do sistema da Microsoft
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("System", LogEventLevel.Warning)
-
-    // Saída 1: Console (Para você ver rodando)
     .WriteTo.Console()
-
-    // Saída 2: Arquivo .txt
-    // Cria na pasta /logs do projeto. Um arquivo novo por dia.
     .WriteTo.File("logs/log-.txt",
         rollingInterval: RollingInterval.Day,
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateBootstrapLogger();
 
-    // Saída 3: Seq (Docker)
-    // Só funciona se o Docker estiver rodando, mas não quebra se não estiver.
-    .WriteTo.Seq("http://localhost:5341")
-
-    .CreateLogger();
-
-// Substitui o logger padrão do .NET pelo Serilog
-builder.Host.UseSerilog();
-
-//servicos
-builder.Services.AddScoped<CalculoService>();
-builder.Services.AddScoped<ProdutoService>();
-builder.Services.AddScoped<SimulacaoService>();
-
-DotEnv.Load();
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+try
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
+    Log.Information("Iniciando a Aplicação...");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+
+        //Console
+        .WriteTo.Console()
+
+        //Arquivo de TELEMETRIA
+        .WriteTo.Logger(l => l
+            .Filter.ByIncludingOnly(e => e.Properties.ContainsKey("TipoLog") &&
+                                         e.Properties["TipoLog"].ToString().Contains("Telemetria"))
+            .WriteTo.File("logs/log-telemetria-.txt",
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}"))
+
+        //Arquivo GERAL
+        .WriteTo.Logger(l => l
+            .Filter.ByExcluding(e => e.Properties.ContainsKey("TipoLog") &&
+                                     e.Properties["TipoLog"].ToString().Contains("Telemetria"))
+            .WriteTo.File("logs/log-.txt",
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"))
+
+        //Docker
+        .WriteTo.Seq("http://localhost:5341"));
+
+    DotEnv.Load();
+    Log.Information("Variáveis de ambiente carregadas.");
+
+    //Serviços
+    builder.Services.AddScoped<CalculoService>();
+    builder.Services.AddScoped<ProdutoService>();
+    builder.Services.AddScoped<SimulacaoService>();
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
+    //Swagger
+    builder.Services.AddSwaggerGen(options =>
     {
-        Version = "v1",
-        Title = "API Simulador de Crédito",
-        Description = "API para o desafio técnico de simulação de crédito, desenvolvida em .NET 9."
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "API Simulador de Crédito",
+            Description = "API para o desafio técnico de simulação de crédito, desenvolvida em .NET 9."
+        });
+
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     });
 
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-});
+    //Conexão Oracle
+    Log.Information("Configurando conexão com Oracle...");
+    var oracleConnectionString = $"User Id={Environment.GetEnvironmentVariable("ORACLE_USER")};" +
+                                $"Password={Environment.GetEnvironmentVariable("ORACLE_PASSWORD")};" +
+                                $"Data Source={Environment.GetEnvironmentVariable("ORACLE_HOST")}:" +
+                                $"{Environment.GetEnvironmentVariable("ORACLE_PORT")}/{Environment.GetEnvironmentVariable("ORACLE_SID")}";
 
-var oracleConnectionString = $"User Id={Environment.GetEnvironmentVariable("ORACLE_USER")};" +
-                            $"Password={Environment.GetEnvironmentVariable("ORACLE_PASSWORD")};" +
-                            $"Data Source={Environment.GetEnvironmentVariable("ORACLE_HOST")}:" +
-                            $"{Environment.GetEnvironmentVariable("ORACLE_PORT")}/{Environment.GetEnvironmentVariable("ORACLE_SID")}";
-builder.Services.AddDbContext<OracleDbContext>(options =>
-    options.UseOracle(oracleConnectionString));
+    builder.Services.AddDbContext<OracleDbContext>(options =>
+        options.UseOracle(oracleConnectionString));
 
-builder.Services.AddDbContext<SqliteDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
+    //Conexão SQLite
+    builder.Services.AddDbContext<SqliteDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowReactApp",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:5173")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-});
+    // CORS
+    builder.Services.AddCors(options => {
+        options.AddPolicy("AllowReactApp",
+            builder =>
+            {
+                builder.WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+    });
 
-var app = builder.Build();
+    var app = builder.Build();
+    Log.Information("Build da aplicação realizado com sucesso.");
 
-app.UseMiddleware<RequestLoggingMiddleware>();
+    app.UseMiddleware<RequestLoggingMiddleware>();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
+    if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
-    });
+        app.UseSwaggerUI(options =>
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        });
+        Log.Information("Swagger Habilitado.");
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseCors("AllowReactApp");
+
+    app.UseAuthorization(); 
+
+    app.MapControllers();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            Log.Information("Verificando banco de dados SQLite...");
+            var sqliteContext = scope.ServiceProvider.GetRequiredService<SqliteDbContext>();
+            sqliteContext.Database.EnsureCreated();
+            Log.Information("Banco de dados verificado/criado.");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Erro crítico ao criar o banco de dados SQLite.");
+            throw;
+        }
+    }
+
+    Log.Information("Aplicação iniciada e aguardando requisições.");
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.UseCors("AllowReactApp");
-
-app.UseAuthorization();
-
-// Creating SQLite Database and Simulacoes table automatically
-using (var scope = app.Services.CreateScope())
+catch (Exception ex)
 {
-    var sqliteContext = scope.ServiceProvider.GetRequiredService<SqliteDbContext>();
-    sqliteContext.Database.EnsureCreated();
+    Log.Fatal(ex, "Falha no startup da aplicação");
 }
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
