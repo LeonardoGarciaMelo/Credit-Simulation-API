@@ -1,11 +1,41 @@
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using Simulador_de_Credito.Data;
+using Simulador_de_Credito.Middleware;
 using Simulador_de_Credito.Service;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    // Ignora logs do sistema da Microsoft
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+
+    // Saída 1: Console (Para você ver rodando)
+    .WriteTo.Console()
+
+    // Saída 2: Arquivo .txt
+    // Cria na pasta /logs do projeto. Um arquivo novo por dia.
+    .WriteTo.File("logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+
+    // Saída 3: Seq (Docker)
+    // Só funciona se o Docker estiver rodando, mas não quebra se não estiver.
+    .WriteTo.Seq("http://localhost:5341")
+
+    .CreateLogger();
+
+// Substitui o logger padrão do .NET pelo Serilog
+builder.Host.UseSerilog();
+
+//servicos
 builder.Services.AddScoped<CalculoService>();
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<SimulacaoService>();
@@ -51,6 +81,8 @@ builder.Services.AddCors(options => {
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
