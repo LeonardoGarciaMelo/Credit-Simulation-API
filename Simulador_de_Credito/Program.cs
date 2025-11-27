@@ -1,4 +1,5 @@
 using dotenv.net;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -6,6 +7,7 @@ using Serilog.Events;
 using Simulador_de_Credito.Data;
 using Simulador_de_Credito.Middleware;
 using Simulador_de_Credito.Service;
+using Simulador_de_Credito.Utils;
 using System.Reflection;
 
 // Configuração inicial leve apenas para garantir que erros de startup sejam gravados.
@@ -103,9 +105,23 @@ try
             });
     });
 
+    //Verifica se os bancos estão disponíveis
+    builder.Services.AddHealthChecks()
+    .AddDbContextCheck<OracleDbContext>(
+        name: "OracleDB",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy)
+    .AddDbContextCheck<SqliteDbContext>(
+        name: "SQLiteDB",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
+
+
     var app = builder.Build();
     Log.Information("Build da aplicação realizado com sucesso.");
 
+    app.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        ResponseWriter = HealthCheckResponseWriter.WriteResponse
+    });
     app.UseMiddleware<RequestLoggingMiddleware>();
 
     if (app.Environment.IsDevelopment())
