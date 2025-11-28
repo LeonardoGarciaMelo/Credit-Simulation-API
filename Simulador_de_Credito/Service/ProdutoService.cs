@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Simulador_de_Credito.Data;
 using Simulador_de_Credito.DTO;
 
@@ -14,7 +15,6 @@ namespace Simulador_de_Credito.Service
     public class ProdutoService
     {
         private readonly OracleDbContext _context;
-
         public ProdutoService(OracleDbContext context)
         {
             _context = context;
