@@ -10,8 +10,8 @@ using Simulador_de_Credito.Service;
 using Simulador_de_Credito.Utils;
 using System.Reflection;
 
-// Configuração inicial leve apenas para garantir que erros de startup sejam gravados.
-// Se a aplicação quebrar este logger vai salvar o erro no arquivo.
+// Configuraï¿½ï¿½o inicial leve apenas para garantir que erros de startup sejam gravados.
+// Se a aplicaï¿½ï¿½o quebrar este logger vai salvar o erro no arquivo.
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
@@ -23,7 +23,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Iniciando a Aplicação...");
+    Log.Information("Iniciando a Aplicaï¿½ï¿½o...");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -57,9 +57,9 @@ try
         .WriteTo.Seq("http://localhost:5341"));
 
     DotEnv.Load();
-    Log.Information("Variáveis de ambiente carregadas.");
+    Log.Information("Variï¿½veis de ambiente carregadas.");
 
-    //Serviços
+    //Serviï¿½os
     builder.Services.AddScoped<CalculoService>();
     builder.Services.AddScoped<ProdutoService>();
     builder.Services.AddScoped<SimulacaoService>();
@@ -72,16 +72,16 @@ try
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
-            Title = "API Simulador de Crédito",
-            Description = "API para o desafio técnico de simulação de crédito, desenvolvida em .NET 9."
+            Title = "API Simulador de Crï¿½dito",
+            Description = "API para o desafio tï¿½cnico de simulaï¿½ï¿½o de crï¿½dito, desenvolvida em .NET 8."
         });
 
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     });
 
-    //Conexão Oracle
-    Log.Information("Configurando conexão com Oracle...");
+    //Conexï¿½o Oracle
+    Log.Information("Configurando conexï¿½o com Oracle...");
     var oracleConnectionString = $"User Id={Environment.GetEnvironmentVariable("ORACLE_USER")};" +
                                 $"Password={Environment.GetEnvironmentVariable("ORACLE_PASSWORD")};" +
                                 $"Data Source={Environment.GetEnvironmentVariable("ORACLE_HOST")}:" +
@@ -90,7 +90,7 @@ try
     builder.Services.AddDbContext<OracleDbContext>(options =>
         options.UseOracle(oracleConnectionString));
 
-    //Conexão SQLite
+    //Conexï¿½o SQLite
     builder.Services.AddDbContext<SqliteDbContext>(options =>
         options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
 
@@ -105,7 +105,7 @@ try
             });
     });
 
-    //Verifica se os bancos estão disponíveis
+    //Verifica se os bancos estï¿½o disponï¿½veis
     builder.Services.AddHealthChecks()
     .AddDbContextCheck<OracleDbContext>(
         name: "OracleDB",
@@ -116,7 +116,7 @@ try
 
 
     var app = builder.Build();
-    Log.Information("Build da aplicação realizado com sucesso.");
+    Log.Information("Build da aplicaï¿½ï¿½o realizado com sucesso.");
 
     app.MapHealthChecks("/health", new HealthCheckOptions
     {
@@ -124,16 +124,16 @@ try
     });
     app.UseMiddleware<RequestLoggingMiddleware>();
 
-    if (app.Environment.IsDevelopment())
+    //if (app.Environment.IsDevelopment())
+    
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
         app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        });
-        Log.Information("Swagger Habilitado.");
-    }
+        app.UseSwaggerUI();
+    });
+    Log.Information("Swagger Habilitado.");
+    
 
     app.UseHttpsRedirection();
 
@@ -154,17 +154,17 @@ try
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Erro crítico ao criar o banco de dados SQLite.");
+            Log.Fatal(ex, "Erro crï¿½tico ao criar o banco de dados SQLite.");
             throw;
         }
     }
 
-    Log.Information("Aplicação iniciada e aguardando requisições.");
+    Log.Information("Aplicaï¿½ï¿½o iniciada e aguardando requisiï¿½ï¿½es.");
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Falha no startup da aplicação");
+    Log.Fatal(ex, "Falha no startup da aplicaï¿½ï¿½o");
 }
 finally
 {

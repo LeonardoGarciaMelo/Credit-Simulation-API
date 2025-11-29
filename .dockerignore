@@ -1,0 +1,10 @@
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/bin/
+**/obj/
+**/logs/
+.vs/
+.git/
+*.user
+.env
