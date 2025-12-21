@@ -2,13 +2,13 @@
 
 > **Uma API REST robusta e containerizada para simulação de crédito financeiro, implementando arquitetura em camadas, logs estruturados e testes automatizados.**
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
 Este projeto é uma modernização e refatoração completa de um desafio de um Hackathon. Foi reescrito utilizando as melhores práticas do ecossistema **.NET 8**.
 
 O objetivo é fornecer um motor de cálculo financeiro (SAC e Price) resiliente, observável e pronto para ambientes de nuvem (Cloud-Native), mas mantendo requisitos de auditoria bancária tradicional.
 
-### 🚀 Principais Features
+### Principais Features
 
 * **Cálculos Financeiros de Precisão:** Algoritmos validados para sistemas de amortização SAC e Price.
 * **Persistência Híbrida:**
@@ -20,7 +20,7 @@ O objetivo é fornecer um motor de cálculo financeiro (SAC e Price) resiliente,
 
 ---
 
-## 🏗️ Arquitetura e Padrões
+## Arquitetura e Padrões
 
 O projeto segue uma arquitetura limpa focada em manutenibilidade e escalabilidade:
 
@@ -37,7 +37,7 @@ O projeto segue uma arquitetura limpa focada em manutenibilidade e escalabilidad
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 * **Core:** C# .NET 8 (Web API)
 * **ORM:** Entity Framework Core
@@ -49,14 +49,14 @@ O projeto segue uma arquitetura limpa focada em manutenibilidade e escalabilidad
 
 ---
 
-## 🚀 Como Rodar o Projeto
+## Como Rodar o Projeto
 
 ### Pré-requisitos
 
 * [Docker](https://www.docker.com/) e Docker Compose instalados.
 * (Opcional) .NET 8 SDK para rodar localmente sem Docker.
 
-### 🔒 Configuração de Ambiente (.env)
+### Configuração de Ambiente (.env)
 
 Por segurança, as credenciais não estão versionadas. Crie um arquivo `.env` na raiz do projeto seguindo o modelo abaixo:
 
