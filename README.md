@@ -1,76 +1,110 @@
 # Credit Simulation API
 
-> **Uma API REST robusta e containerizada para simulação de crédito financeiro, implementando arquitetura em camadas, logs estruturados e testes automatizados.**
+> **A robust, containerized REST API for financial credit simulation, implementing clean architecture, structured logging, and automated testing.**
 
-## Sobre o Projeto
+## About the Project
 
-Este projeto é uma modernização e refatoração completa de um desafio de um Hackathon. Foi reescrito utilizando as melhores práticas do ecossistema **.NET 8**.
+This project is a complete modernization and refactoring of a Hackathon challenge. It has been rewritten from scratch using the best practices of the **.NET 8** ecosystem.
 
-O objetivo é fornecer um motor de cálculo financeiro (SAC e Price) resiliente, observável e pronto para ambientes de nuvem (Cloud-Native), mas mantendo requisitos de auditoria bancária tradicional.
+The goal is to provide a resilient, observable, and Cloud-Native financial calculation engine (SAC and Price amortization systems), while maintaining compliance with traditional banking audit requirements.
 
-### Principais Features
+### Key Features
 
-* **Cálculos Financeiros de Precisão:** Algoritmos validados para sistemas de amortização SAC e Price.
-* **Persistência Híbrida:**
-    * **Oracle Database:** Leitura de parâmetros de produtos (Simulação de Legado/Mainframe).
-    * **SQLite:** Gravação transacional de histórico de simulações.
-* **Relatórios Agregados:** Endpoints analíticos com agregação de dados e enriquecimento (Enrichment) entre bancos distintos.
-* **Paginação Server-Side:** Otimização de performance para listagem de grandes volumes de dados.
-* **Health Checks:** Monitoramento ativo de dependências (Liveness/Readiness) para orquestradores (K8s).
+* **Precision Financial Calculations:** Validated algorithms for SAC and Price amortization systems.
+* **Hybrid Persistence:**
+    * **Oracle Database:** Reads product parameters (simulating Legacy/Mainframe integration).
+    * **SQLite:** Transactional storage for simulation history.
+* **Aggregated Reports:** Analytical endpoints with data aggregation and enrichment across distinct databases.
+* **Server-Side Pagination:** Performance optimization for listing large datasets.
+* **Health Checks:** Active dependency monitoring (Liveness/Readiness) for orchestrators (K8s).
 
 ---
 
-## Arquitetura e Padrões
+## Architecture & Patterns
 
-O projeto segue uma arquitetura limpa focada em manutenibilidade e escalabilidade:
+The project follows a Clean Architecture approach focused on maintainability and scalability:
 
-1.  **Observabilidade Híbrida (Diferencial):**
-    * **Logs de Auditoria (.txt):** Gravação em disco com rotação diária para conformidade bancária.
-    * **Logs de Telemetria (Seq):** Envio de logs estruturados para servidor Seq via Docker para análise em tempo real.
-    * **Middleware Customizado:** Interceptação de requisições para cronometragem e registro de falhas globais.
-2.  **Qualidade de Código:**
-    * **Testes Unitários (xUnit):** Cobertura de lógica de negócio e serviços.
-    * **Mocking (Moq) & In-Memory DB:** Testes isolados sem dependência de infraestrutura externa.
+1.  **Hybrid Observability:**
+    * **Audit Logs (.txt):** Disk storage with daily rotation for banking compliance.
+    * **Telemetry Logs (Seq):** Structured log shipping to a Seq server via Docker for real-time analysis.
+    * **Custom Middleware:** Request interception for timing and global error handling.
+2.  **Code Quality:**
+    * **Unit Testing (xUnit):** Coverage of business logic and services.
+    * **Mocking (Moq) & In-Memory DB:** Isolated tests without external infrastructure dependencies.
 3.  **DevOps:**
-    * **Docker Multi-Stage Build:** Imagens otimizadas para produção.
-    * **Docker Compose:** Orquestração completa do ambiente (API + Logs).
+    * **Docker Multi-Stage Build:** Optimized images for production.
+    * **Docker Compose:** Full environment orchestration (API + Logs).
 
 ---
 
-## Tecnologias Utilizadas
+## Tech Stack
 
 * **Core:** C# .NET 8 (Web API)
 * **ORM:** Entity Framework Core
-* **Bancos de Dados:** Oracle (Provedor ODP.NET) e SQLite
-* **Logging:** Serilog (Sinks para File, Console e Seq)
-* **Documentação:** Swagger / OpenAPI
-* **Testes:** xUnit, Moq, FluentAssertions
-* **Containerização:** Docker e Docker Compose
+* **Databases:** Oracle (ODP.NET Provider) and SQLite
+* **Logging:** Serilog (Sinks for File, Console, and Seq)
+* **Documentation:** Swagger / OpenAPI
+* **Testing:** xUnit, Moq, FluentAssertions
+* **Containerization:** Docker and Docker Compose
 
 ---
 
-## Como Rodar o Projeto
+## How to Run
 
-### Pré-requisitos
+### Prerequisites
 
-* [Docker](https://www.docker.com/) e Docker Compose instalados.
-* (Opcional) .NET 8 SDK para rodar localmente sem Docker.
+* [Docker](https://www.docker.com/) and Docker Compose installed.
+* (Optional) .NET 8 SDK for local execution without Docker.
 
-### Configuração de Ambiente (.env)
+### Environment Configuration (.env)
 
-Por segurança, as credenciais não estão versionadas. Crie um arquivo `.env` na raiz do projeto seguindo o modelo abaixo:
+For security reasons, credentials are not versioned. Create a `.env` file in the project root following the model below:
 
 ```env
-# Configurações da Aplicação
+# Application Settings
 ASPNETCORE_ENVIRONMENT=Production
 SEQ_URL=http://seq:5341
 
-# Senha de Administração do Seq (Defina sua senha forte)
-SEQ_ADMIN_PASSWORD=SuaSenha
+# Seq Admin Password 
+SEQ_ADMIN_PASSWORD=YourPassword
 
-# Credenciais do Banco Oracle (Exemplo)
-ORACLE_USER=usuario
-ORACLE_PASSWORD=Senha
-ORACLE_HOST=host
+# Oracle Database Credentials (Example)
+ORACLE_USER=User
+ORACLE_PASSWORD=Password
+ORACLE_HOST=Host
+ORACLE_PORT=Port
+ORACLE_SID=SID
+```
+
+## Running with Docker (Recommended)
+The easiest way to start the complete environment (API + Log System) is via Docker Compose. In the terminal, at the project root:
+```
+docker compose up -d --build
+```
+
+This command will:
+- Build the application and run Unit Tests (Build fails if tests do not pass).
+- Start the API container on port 5050.
+- Start the Seq container on port 5341.
+
+Access:
+- Swagger (API): http://localhost:5050/swagger
+- Seq (Logs): http://localhost:5341 (Login: admin / Password: The one set in .env)
+- Health Check: http://localhost:5050/health
+
+## Running Locally (Visual Studio / VS Code)
+If you wish to debug the code:
+Ensure the .env file is configured.
+Restore packages: dotnet restore.
+Run the application: dotnet run --project Simulador_de_Credito.
+Logs will be generated in the /logs folder at the project root.
+
+## Running Tests
+The project includes a unit test suite that validates the calculation logic (SAC/Price) and service flow.
+```
+dotnet test
+```
+output Example:
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 23 ms
 ORACLE_PORT=porta
 ORACLE_SID=SID
